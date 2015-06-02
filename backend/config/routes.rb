@@ -1,3 +1,4 @@
 Rails.application.routes.draw do
-  root 'pages#index'
+  root 'issues#open'
+  get '/tag-counts' => 'issues#tag_counts'
 end

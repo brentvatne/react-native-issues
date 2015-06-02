@@ -1,31 +1,19 @@
 var React = require('react');
 var request = require('superagent');
-
-var Issue = React.createClass({
-  render() {
-    var { id, title, url, number, } = this.props.value;
-
-    return (
-      <p key={id}>
-        <a href={'https://github.com/facebook/react-native/issues/' + number} target="_blank">
-          {title}
-        </a>
-      </p>
-    )
-  },
-});
+var { Treemap, BarChart, } = require('react-d3');
+var _ = require('lodash');
 
 var App = React.createClass({
   getInitialState() {
-    return {issues: null};
+    return {tags: null};
   },
 
   componentWillMount() {
     request.
-      get('http://react-native-issues-api.herokuapp.com').
+      get('http://react-native-issues-api.herokuapp.com/tag-counts').
       end((err, result) => {
         if (!err) {
-          this.setState({issues: result.body});
+          this.setState({tags: result.body});
         } else {
           this.setState({error: true});
         }
@@ -33,10 +21,31 @@ var App = React.createClass({
   },
 
   render() {
-    if (this.state.issues) {
+    if (this.state.tags) {
+      var data = _.map(this.state.tags, (count, tag) => {
+        return {label: tag, value: count};
+      });
+
+      data = _.filter(data, (datum) => {
+        return datum.value > 1;
+      });
+
       return (
         <div>
-          {this.state.issues.map((i) => <Issue value={i} />)}
+          <BarChart
+            data={data}
+            width={1200}
+            height={400}
+            fill={'#3182bd'}
+            title='Issue Distribution' />
+
+          <Treemap
+            data={data}
+            width={1200}
+            height={400}
+            textColor="#484848"
+            fontSize="10px"
+            title="Treemap" />
         </div>
       )
     } else {

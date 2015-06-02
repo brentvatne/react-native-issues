@@ -1,3 +1,5 @@
+require Rails.root.to_s + '/lib/count_by'
+
 class Issue < ActiveRecord::Base
   validates :github_id, uniqueness: true
 
@@ -10,6 +12,15 @@ class Issue < ActiveRecord::Base
            friday, friday, friday,
            sunday, sunday, sunday)
   }
+
+  def self.open_issue_tags
+    Issue.open.excluding_prs.pluck(:title).
+      map { |i| i.match(/\[.*?\]/) }.
+      map(&:to_s).
+      map { |tag| tag.gsub('[','').gsub(']','') }.
+      count_by(&:to_s).
+      to_h
+  end
 
   scope :prs, -> {
     where(pull_request: true)
