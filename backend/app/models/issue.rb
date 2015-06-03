@@ -38,6 +38,10 @@ class Issue < ActiveRecord::Base
     where(closed_at: nil)
   }
 
+  def closed?
+    closed_at.present?
+  end
+
   def self.closed_in_first_triage
     Issue.first_triage.sort_by(&:title).map { |i|
       "#{i['closed_at'].present? ? '[Closed]' : '[Open]'}: #{i['title']}"

@@ -20446,7 +20446,7 @@
 	  displayName: 'App',
 
 	  getInitialState: function getInitialState() {
-	    return { tags: null };
+	    return { tags: null, commenters: null };
 	  },
 
 	  componentWillMount: function componentWillMount() {
@@ -20459,17 +20459,31 @@
 	        _this.setState({ error: true });
 	      }
 	    });
+
+	    request.get('http://react-native-issues-api.herokuapp.com/unique-commenters').end(function (err, result) {
+	      if (!err) {
+	        _this.setState({ commenters: result.body });
+	      } else {
+	        _this.setState({ error: true });
+	      }
+	    });
 	  },
 
 	  render: function render() {
-	    if (this.state.tags) {
-	      var data = _.map(this.state.tags, function (count, tag) {
+	    if (this.state.tags && this.state.commenters) {
+	      var allData = _.map(this.state.tags, function (count, tag) {
 	        return { label: tag, value: count };
 	      });
 
-	      data = _.filter(data, function (datum) {
+	      var data = _.filter(allData, function (datum) {
 	        return datum.value > 1;
 	      });
+
+	      var otherData = _.filter(allData, function (datum) {
+	        return datum.value == 1;
+	      });
+
+	      var commenters = this.state.commenters;
 
 	      return React.createElement(
 	        'div',
@@ -20486,7 +20500,49 @@
 	          height: 400,
 	          textColor: '#484848',
 	          fontSize: '10px',
-	          title: 'Treemap' })
+	          title: 'Treemap' }),
+	        React.createElement(
+	          'div',
+	          null,
+	          React.createElement(
+	            'h3',
+	            null,
+	            'Others..'
+	          ),
+	          React.createElement(
+	            'ul',
+	            null,
+	            otherData.map(function (item) {
+	              return React.createElement(
+	                'li',
+	                null,
+	                item.label
+	              );
+	            })
+	          )
+	        ),
+	        React.createElement(
+	          'div',
+	          null,
+	          React.createElement(
+	            'h3',
+	            null,
+	            'Sorted by unique commenters'
+	          ),
+	          React.createElement(
+	            'ul',
+	            null,
+	            commenters.map(function (item) {
+	              return React.createElement(
+	                'li',
+	                null,
+	                item.unique_commenters,
+	                ' - ',
+	                item.title
+	              );
+	            })
+	          )
+	        )
 	      );
 	    } else {
 	      return React.createElement(

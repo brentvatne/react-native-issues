@@ -7,6 +7,7 @@ gem 'unicorn'
 gem 'octokit'
 gem 'dotenv-rails'
 gem 'rack-cors', require: 'rack/cors'
+gem 'httparty'
 
 # Remove these
 gem 'uglifier'

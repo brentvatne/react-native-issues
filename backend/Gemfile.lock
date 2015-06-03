@@ -54,6 +54,9 @@ GEM
       multipart-post (>= 1.2, < 3)
     globalid (0.3.5)
       activesupport (>= 4.1.0)
+    httparty (0.13.3)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
     i18n (0.7.0)
     json (1.8.2)
     kgio (2.9.3)
@@ -64,6 +67,7 @@ GEM
     mime-types (2.6.1)
     mini_portile (0.6.2)
     minitest (5.7.0)
+    multi_xml (0.5.5)
     multipart-post (2.0.0)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
@@ -145,6 +149,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   dotenv-rails
+  httparty
   octokit
   pg
   rack-cors
