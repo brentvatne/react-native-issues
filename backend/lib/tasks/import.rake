@@ -1,3 +1,47 @@
+task import_commenters: [:environment] do
+  page = 1
+  client = Octokit::Client.new(
+    :client_id     => ENV['GITHUB_CLIENT_ID'],
+    :client_secret => ENV['GITHUB_CLIENT_SECRET']
+  )
+
+  all_commenters = Hash.new(0)
+
+  loop do
+    begin
+      issues = client.issues('facebook/react-native', per_page: 100, page: page, state: 'all')
+
+      issues.each do |issue|
+        response = HTTParty.get(
+          issue.comments_url +
+          "?client_id=#{ENV['GITHUB_CLIENT_ID']}&client_secret=#{ENV['GITHUB_CLIENT_SECRET']}"
+        )
+        comments = JSON.parse(response.body)
+        commenters = comments.
+          map { |response| response['user']['login'] }
+
+        # Increment count for the issue creator
+        all_commenters[issue[:user][:login]] += 1
+
+        # Increment count for each commenter
+        commenters.each do |commenter|
+          all_commenters[commenter] += 1
+        end
+
+        # Just log it so I can watch progress
+        puts "##{issue[:number]}: #{issue[:title]} (page: #{page})"
+        sleep 3
+      end
+
+      puts all_commenters
+
+      page = page + 1
+    rescue Exception => e
+      debugger
+    end
+  end
+end
+
 task import_issues: [:environment] do
   page = 1
   client = Octokit::Client.new(
